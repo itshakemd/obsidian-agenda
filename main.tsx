@@ -7,5 +7,22 @@ export default class AgendaPlugin extends Plugin {
       AGENDAVIEW_VIEW_TYPE,
       (leaf) => new AgendaView(leaf, this)
     );
+
+    const ribbonIconEl = this.addRibbonIcon("calendar", "Open Agenda", () => {
+      this.activateView();
+    });
+    ribbonIconEl.addClass("agenda-ribbon-icon");
+  }
+
+  async activateView() {
+    const { workspace } = this.app;
+
+    const leaves = workspace.getLeavesOfType(AGENDAVIEW_VIEW_TYPE);
+    const leaf = leaves[0] ?? workspace.getLeaf("tab");
+    if (leaves.length === 0) {
+      await leaf.setViewState({ type: AGENDAVIEW_VIEW_TYPE, active: true });
+    }
+
+    workspace.revealLeaf(leaf);
   }
 }
