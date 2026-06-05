@@ -12,6 +12,14 @@ export default class AgendaPlugin extends Plugin {
       this.activateView();
     });
     ribbonIconEl.addClass("agenda-ribbon-icon");
+
+    this.addCommand({
+      id: "open-agenda-view",
+      name: "Open Agenda",
+      callback: () => {
+        this.activateView();
+      },
+    });
   }
 
   async activateView() {
