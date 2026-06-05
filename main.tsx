@@ -2,7 +2,11 @@ import { Plugin } from "obsidian";
 import { AgendaView, AGENDAVIEW_VIEW_TYPE } from "./src/view/AgendaView";
 
 export default class AgendaPlugin extends Plugin {
+  settings: any = {};
+
   async onload(): Promise<void> {
+    await this.loadSettings();
+
     this.registerView(
       AGENDAVIEW_VIEW_TYPE,
       (leaf) => new AgendaView(leaf, this)
@@ -32,5 +36,14 @@ export default class AgendaPlugin extends Plugin {
     }
 
     workspace.revealLeaf(leaf);
+  }
+
+  async loadSettings(): Promise<void> {
+    const data = (await this.loadData()) as any;
+    this.settings = Object.assign({}, data);
+  }
+
+  async saveSettings(): Promise<void> {
+    await this.saveData(this.settings);
   }
 }
