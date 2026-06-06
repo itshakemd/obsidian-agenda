@@ -1,8 +1,9 @@
 import { Plugin } from "obsidian";
+import { DEFAULT_SETTINGS, type AgendaSettings } from "./src/settings";
 import { AgendaView, AGENDAVIEW_VIEW_TYPE } from "./src/view/AgendaView";
 
 export default class AgendaPlugin extends Plugin {
-  settings: any = {};
+  settings: AgendaSettings = { ...DEFAULT_SETTINGS };
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -39,8 +40,8 @@ export default class AgendaPlugin extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    const data = (await this.loadData()) as any;
-    this.settings = Object.assign({}, data);
+    const data = (await this.loadData()) as Partial<AgendaSettings> | null;
+    this.settings = { ...DEFAULT_SETTINGS, ...(data ?? {}) };
   }
 
   async saveSettings(): Promise<void> {
