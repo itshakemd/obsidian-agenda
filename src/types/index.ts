@@ -1,5 +1,9 @@
 import type { TFile } from "obsidian";
 
+export type ActiveFilter = "all" | "unfinished" | "date" | "tag" | "folder" | "events";
+
+export type ViewMode = "feed" | "tile";
+
 export interface AgendaItem {
   id: string;
   path: string;
@@ -26,4 +30,20 @@ export interface EventItem {
   description: string;
   file: TFile;
   tags: string[];
+}
+
+export type FeedEntry =
+  | { type: "agenda"; item: AgendaItem; sortDate: Date }
+  | { type: "event"; item: EventItem; sortDate: Date };
+
+export interface ExtractedImage {
+  src: string;
+  alt: string;
+  file?: TFile;
+}
+
+export interface FolderCount {
+  path: string;
+  name: string;
+  count: number;
 }
