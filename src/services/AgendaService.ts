@@ -11,4 +11,11 @@ export class AgendaService {
     this.app = app;
     this.settings = settings;
   }
+
+  async ensureAgendaFolder(): Promise<void> {
+    const folder = this.app.vault.getAbstractFileByPath(this.agendaFolder);
+    if (!folder) {
+      await this.app.vault.createFolder(this.agendaFolder);
+    }
+  }
 }

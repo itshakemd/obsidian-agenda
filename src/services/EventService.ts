@@ -8,4 +8,11 @@ export class EventService {
   constructor(app: App) {
     this.app = app;
   }
+
+  async ensureEventsFolder(): Promise<void> {
+    const folder = this.app.vault.getAbstractFileByPath(this.eventsFolder);
+    if (!folder) {
+      await this.app.vault.createFolder(this.eventsFolder);
+    }
+  }
 }
