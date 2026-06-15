@@ -20,6 +20,31 @@ export class AgendaService {
     }
   }
 
+  private parseTasks(content: string): { hasUnfinished: boolean } {
+    const taskRegex = /^\s*-\s*\[([ xX])\]\s*(.*)$/gm;
+    let match: RegExpExecArray | null;
+    let hasUnfinished = false;
+    while ((match = taskRegex.exec(content)) !== null) {
+      if (match[1] === " ") {
+        hasUnfinished = true;
+      }
+    }
+    return { hasUnfinished };
+  }
+
+  private parseLinks(content: string): Array<{ title: string; url: string }> {
+    const links: Array<{ title: string; url: string }> = [];
+    const wikiRegex = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+    let match: RegExpExecArray | null;
+    while ((match = wikiRegex.exec(content)) !== null) {
+      links.push({
+        title: match[2] ? match[2].trim() : match[1].trim(),
+        url: match[1].trim(),
+      });
+    }
+    return links;
+  }
+
   async loadAgendaItems(): Promise<AgendaItem[]> {
     const files = this.app.vault.getMarkdownFiles();
     const items: AgendaItem[] = [];
@@ -31,6 +56,16 @@ export class AgendaService {
       }
 
       const content = await this.app.vault.read(file);
+      const cache = this.app.metadataCache.getFileCache(file);
+      const tags: string[] = [];
+      if (cache?.tags) {
+        for (const t of cache.tags) {
+          tags.push(t.tag.replace(/^#/, ""));
+        }
+      }
+
+      const { hasUnfinished } = this.parseTasks(content);
+      const links = this.parseLinks(content);
       const stat = file.stat;
       const date = new Date(stat.mtime);
       const dateKey = toDateKey(date);
@@ -43,10 +78,10 @@ export class AgendaService {
         date,
         dateKey,
         content,
-        tags: [],
+        tags: Array.from(new Set(tags)),
         file,
-        hasUnfinishedTasks: false,
-        links: [],
+        hasUnfinishedTasks: hasUnfinished,
+        links,
       });
     }
 
