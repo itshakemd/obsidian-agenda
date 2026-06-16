@@ -25,21 +25,50 @@ export class EventService {
     for (const child of folder.children) {
       if (child instanceof TFile && child.extension === "md") {
         const content = await this.app.vault.read(child);
+        const cache = this.app.metadataCache.getFileCache(child);
+        const fm = cache?.frontmatter;
+
         const stat = child.stat;
         const fileDate = new Date(stat.mtime);
+
+        let eventDate = fileDate;
+        let eventDateKey = toDateKey(fileDate);
+        let eventTime: string | null = null;
+        let title = child.basename;
+
+        if (fm) {
+          if (fm["event-title"]) title = String(fm["event-title"]);
+          if (fm["event-date"]) {
+            eventDateKey = String(fm["event-date"]);
+            const parts = eventDateKey.split("-").map((x) => parseInt(x, 10));
+            if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+              eventDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+          }
+          if (fm["event-time"]) eventTime = String(fm["event-time"]);
+        }
+
+        const tags: string[] = [];
+        if (cache?.tags) {
+          for (const t of cache.tags) {
+            tags.push(t.tag.replace(/^#/, ""));
+          }
+        }
+
+        const desc = content.replace(/^---[\s\S]*?---\n?/, "").trim();
 
         items.push({
           id: child.path,
           path: child.path,
-          title: child.basename,
+          title,
           date: fileDate,
           dateKey: toDateKey(fileDate),
-          eventDate: fileDate,
-          eventDateKey: toDateKey(fileDate),
-          eventTime: null,
-          description: content,
+          eventDate,
+          eventDateKey,
+          eventTime,
+          description: desc,
           file: child,
-          tags: [],
+          tags: Array.from(new Set(tags)),
         });
       }
     }
