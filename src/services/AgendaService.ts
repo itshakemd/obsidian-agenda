@@ -2,6 +2,7 @@ import { App, TFile, TFolder } from "obsidian";
 import type { AgendaSettings } from "../settings";
 import type { AgendaItem } from "../types";
 import { toDateKey } from "../utils/date";
+import { sanitizeFileName } from "../utils/sanitize";
 
 export class AgendaService {
   private app: App;
@@ -87,5 +88,19 @@ export class AgendaService {
 
     items.sort((a, b) => b.date.getTime() - a.date.getTime());
     return items;
+  }
+
+  async saveAgendaItem(text: string): Promise<TFile> {
+    await this.ensureAgendaFolder();
+    const timestamp = Date.now();
+    const firstLine = text.trim().split("\n")[0] || "Agenda Item";
+    const sanitized = sanitizeFileName(firstLine).slice(0, 40) || `Agenda ${timestamp}`;
+    const filePath = `${this.agendaFolder}/${sanitized} ${timestamp}.md`;
+    const created = await this.app.vault.create(filePath, text);
+    return created as TFile;
+  }
+
+  async deleteAgendaItem(file: TFile): Promise<void> {
+    await this.app.vault.delete(file);
   }
 }
