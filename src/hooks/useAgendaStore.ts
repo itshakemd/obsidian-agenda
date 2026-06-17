@@ -9,12 +9,14 @@ export interface AgendaState {
   showEventComposer: boolean;
   viewMode: ViewMode;
   folders: FolderCount[];
+  isLoading: boolean;
 }
 
-export type StateListener = (state: AgendaState) => void;
+export type StateListener = () => void;
 
 export class AgendaStore {
   private state: AgendaState;
+  private listeners: Set<StateListener> = new Set();
 
   constructor(initialState?: Partial<AgendaState>) {
     this.state = {
@@ -26,6 +28,7 @@ export class AgendaStore {
       showEventComposer: false,
       viewMode: "feed",
       folders: [],
+      isLoading: false,
       ...initialState,
     };
   }
@@ -36,5 +39,17 @@ export class AgendaStore {
 
   setState(partial: Partial<AgendaState>): void {
     this.state = { ...this.state, ...partial };
+    this.notify();
+  }
+
+  subscribe(listener: StateListener): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  notify(): void {
+    for (const listener of this.listeners) {
+      listener();
+    }
   }
 }
