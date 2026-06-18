@@ -1,79 +1,94 @@
-import { App, TFile, TFolder } from "obsidian";
-import type { EventItem } from "../types";
+import { TFile, type App } from "obsidian";
 import { toDateKey } from "../utils/date";
+import { sanitizeFileName } from "../utils/sanitize";
+import type { EventItem } from "../types";
 
 export class EventService {
   private app: App;
-  private eventsFolder = "Events";
+  private readonly eventsFolder = "Events";
 
   constructor(app: App) {
     this.app = app;
   }
 
   async ensureEventsFolder(): Promise<void> {
-    const folder = this.app.vault.getAbstractFileByPath(this.eventsFolder);
-    if (!folder) {
-      await this.app.vault.createFolder(this.eventsFolder);
+    if (!this.app.vault.getAbstractFileByPath(this.eventsFolder)) {
+      try {
+        await this.app.vault.createFolder(this.eventsFolder);
+      } catch (error) {
+        if (!this.app.vault.getAbstractFileByPath(this.eventsFolder)) throw error;
+      }
     }
   }
 
   async loadEvents(): Promise<EventItem[]> {
-    const folder = this.app.vault.getAbstractFileByPath(this.eventsFolder);
-    if (!folder || !(folder instanceof TFolder)) return [];
+    await this.ensureEventsFolder();
 
+    const files = this.app.vault.getMarkdownFiles().filter((f) => f.path.startsWith(this.eventsFolder + "/"));
     const items: EventItem[] = [];
-    for (const child of folder.children) {
-      if (child instanceof TFile && child.extension === "md") {
-        const content = await this.app.vault.read(child);
-        const cache = this.app.metadataCache.getFileCache(child);
-        const fm = cache?.frontmatter;
 
-        const stat = child.stat;
-        const fileDate = new Date(stat.mtime);
+    for (const file of files) {
+      const content = await this.app.vault.read(file);
+      const stat = file.stat;
 
-        let eventDate = fileDate;
-        let eventDateKey = toDateKey(fileDate);
-        let eventTime: string | null = null;
-        let title = child.basename;
+      const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+      if (!fmMatch) continue;
 
-        if (fm) {
-          if (fm["event-title"]) title = String(fm["event-title"]);
-          if (fm["event-date"]) {
-            eventDateKey = String(fm["event-date"]);
-            const parts = eventDateKey.split("-").map((x) => parseInt(x, 10));
-            if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-              eventDate = new Date(parts[0], parts[1] - 1, parts[2]);
-            }
-          }
-          if (fm["event-time"]) eventTime = String(fm["event-time"]);
-        }
+      const fm = fmMatch[1];
+      const dateMatch = fm.match(/event-date:\s*(.+)/);
+      const timeMatch = fm.match(/event-time:\s*(.+)/);
+      const titleMatch = fm.match(/event-title:\s*(.+)/);
 
-        const tags: string[] = [];
-        if (cache?.tags) {
-          for (const t of cache.tags) {
-            tags.push(t.tag.replace(/^#/, ""));
-          }
-        }
+      if (!dateMatch) continue;
 
-        const desc = content.replace(/^---[\s\S]*?---\n?/, "").trim();
+      const eventDateStr = dateMatch[1].trim();
+      const eventDate = new Date(eventDateStr + "T00:00:00");
+      if (isNaN(eventDate.getTime())) continue;
 
-        items.push({
-          id: child.path,
-          path: child.path,
-          title,
-          date: fileDate,
-          dateKey: toDateKey(fileDate),
-          eventDate,
-          eventDateKey,
-          eventTime,
-          description: desc,
-          file: child,
-          tags: Array.from(new Set(tags)),
-        });
-      }
+      const eventTime = timeMatch ? timeMatch[1].trim() : null;
+      const eventTitle = titleMatch ? titleMatch[1].trim() : file.basename;
+      const description = content.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
+
+      const tagMatches = content.match(/#([a-zA-Z0-9_\-]+)/g) || [];
+      const tags = Array.from(new Set(tagMatches.map((t) => t.slice(1))));
+
+      const fileDate = new Date(stat.ctime || stat.mtime);
+
+      items.push({
+        id: file.path,
+        path: file.path,
+        title: eventTitle,
+        date: fileDate,
+        dateKey: toDateKey(fileDate),
+        eventDate,
+        eventDateKey: toDateKey(eventDate),
+        eventTime,
+        description,
+        file,
+        tags,
+      });
     }
 
     items.sort((a, b) => a.eventDate.getTime() - b.eventDate.getTime());
     return items;
+  }
+
+  async saveEvent(title: string, eventDate: string, eventTime: string, description: string): Promise<TFile> {
+    await this.ensureEventsFolder();
+    const timestamp = Date.now();
+    const sanitized = sanitizeFileName(title) || `Event ${timestamp}`;
+    const filePath = `${this.eventsFolder}/${sanitized} ${timestamp}.md`;
+
+    let fm = `---\nevent-title: ${title}\nevent-date: ${eventDate}`;
+    if (eventTime) fm += `\nevent-time: ${eventTime}`;
+    fm += `\n---`;
+
+    const fileContent = description ? `${fm}\n\n${description}` : fm;
+    const created = await this.app.vault.create(filePath, fileContent);
+    return created as TFile;
+  }
+
+  async deleteEvent(file: TFile): Promise<void> {
+    await this.app.vault.delete(file);
   }
 }
