@@ -6,6 +6,7 @@ import type { ActiveFilter, ViewMode, FeedEntry } from "../types";
 export interface FilterHooks {
   setFilter(filter: ActiveFilter, value?: string): void;
   clearFilter(): void;
+  selectDate(dayKey: string): void;
   setViewMode(mode: ViewMode): void;
   getFilteredEntries(): FeedEntry[];
 }
@@ -23,6 +24,15 @@ export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks
     store.setState({ activeFilter: "all", filterValue: "" });
   };
 
+  const selectDate = (dayKey: string) => {
+    const s = store.getState();
+    if (s.activeFilter === "date" && s.filterValue === dayKey) {
+      clearFilter();
+    } else {
+      setFilter("date", dayKey);
+    }
+  };
+
   const setViewMode = (mode: ViewMode) => {
     store.setState({ viewMode: mode });
   };
@@ -35,6 +45,7 @@ export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks
   return {
     setFilter,
     clearFilter,
+    selectDate,
     setViewMode,
     getFilteredEntries,
   };
