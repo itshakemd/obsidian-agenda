@@ -9,11 +9,25 @@ export interface FilterHooks {
   selectDate(dayKey: string): void;
   setViewMode(mode: ViewMode): void;
   getFilteredEntries(): FeedEntry[];
+  isPathExcluded(path: string): boolean;
+  toggleExcludeFolder(folderPath: string, excluded: boolean): Promise<void>;
 }
 
 export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks {
   const isPathExcluded = (path: string) => {
     return plugin.settings.excludedFolders.some((f) => path === f || path.startsWith(f + "/"));
+  };
+
+  const toggleExcludeFolder = async (folderPath: string, excluded: boolean) => {
+    const set = new Set(plugin.settings.excludedFolders);
+    if (excluded) {
+      set.add(folderPath);
+    } else {
+      set.delete(folderPath);
+    }
+    plugin.settings.excludedFolders = Array.from(set);
+    await plugin.saveSettings();
+    store.setState({});
   };
 
   const setFilter = (filter: ActiveFilter, value = "") => {
@@ -48,5 +62,7 @@ export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks
     selectDate,
     setViewMode,
     getFilteredEntries,
+    isPathExcluded,
+    toggleExcludeFolder,
   };
 }
