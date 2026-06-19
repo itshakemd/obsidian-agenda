@@ -11,7 +11,15 @@ export class FilterService {
   ): FeedEntry[] {
     let entries: FeedEntry[] = [];
 
-    if (activeFilter === "date") {
+    if (activeFilter === "tag") {
+      const tagAgenda = agendaItems
+        .filter((m) => !isPathExcluded(m.folderPath) && m.tags.includes(filterValue))
+        .map((m) => ({ type: "agenda" as const, item: m, sortDate: m.date }));
+      const tagEvents = events
+        .filter((ev) => ev.tags.includes(filterValue))
+        .map((ev) => ({ type: "event" as const, item: ev, sortDate: ev.eventDate }));
+      entries = [...tagAgenda, ...tagEvents];
+    } else if (activeFilter === "date") {
       const dateAgenda = agendaItems
         .filter((m) => !isPathExcluded(m.folderPath) && m.dateKey === filterValue)
         .map((m) => ({ type: "agenda" as const, item: m, sortDate: m.date }));
@@ -19,6 +27,13 @@ export class FilterService {
         .filter((ev) => ev.eventDateKey === filterValue)
         .map((ev) => ({ type: "event" as const, item: ev, sortDate: ev.eventDate }));
       entries = [...dateAgenda, ...dateEvents];
+    } else if (activeFilter === "folder") {
+      entries = agendaItems
+        .filter((m) => m.folderPath === filterValue || m.path.startsWith(filterValue + "/"))
+        .map((m) => ({ type: "agenda", item: m, sortDate: m.date }));
+      if (filterValue === "Events") {
+        entries.push(...events.map((ev) => ({ type: "event" as const, item: ev, sortDate: ev.date })));
+      }
     } else {
       const allAgenda = agendaItems
         .filter((m) => !isPathExcluded(m.folderPath))
