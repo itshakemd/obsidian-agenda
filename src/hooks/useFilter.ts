@@ -7,6 +7,7 @@ export interface FilterHooks {
   setFilter(filter: ActiveFilter, value?: string): void;
   clearFilter(): void;
   selectDate(dayKey: string): void;
+  changeMonth(delta: number): void;
   setViewMode(mode: ViewMode): void;
   getFilteredEntries(): FeedEntry[];
   isPathExcluded(path: string): boolean;
@@ -47,6 +48,12 @@ export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks
     }
   };
 
+  const changeMonth = (delta: number) => {
+    const current = store.getState().calendarDate;
+    const next = new Date(current.getFullYear(), current.getMonth() + delta, 1);
+    store.setState({ calendarDate: next });
+  };
+
   const setViewMode = (mode: ViewMode) => {
     store.setState({ viewMode: mode });
   };
@@ -60,6 +67,7 @@ export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks
     setFilter,
     clearFilter,
     selectDate,
+    changeMonth,
     setViewMode,
     getFilteredEntries,
     isPathExcluded,
