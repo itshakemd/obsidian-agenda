@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import { ICONS } from "../../constants/icons";
 import { createComposerLogic, type ComposerLogic } from "../../hooks/useComposer";
 
@@ -47,8 +48,18 @@ export class AgendaComposerComponent {
     const submitBtn = actions.createEl("button", { cls: "agenda-composer-submit-btn", text: "Save Note" });
     submitBtn.onclick = async () => {
       const text = ta.value.trim();
-      const ok = await onSubmit(text);
-      if (ok) ta.value = "";
+      if (!text) {
+        new Notice("Please enter note content before saving");
+        ta.focus();
+        return;
+      }
+      submitBtn.disabled = true;
+      try {
+        const ok = await onSubmit(text);
+        if (ok) ta.value = "";
+      } finally {
+        submitBtn.disabled = false;
+      }
     };
   }
 }
