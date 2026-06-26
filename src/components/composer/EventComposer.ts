@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import { toDateKey } from "../../utils/date";
 
 export interface EventComposerProps {
@@ -48,7 +49,24 @@ export class EventComposerComponent {
 
     const saveBtn = actions.createEl("button", { cls: "agenda-composer-submit-btn", text: "Save Event" });
     saveBtn.onclick = async () => {
-      await onSubmit(titleInput.value, dateInput.value, timeInput.value, descInput.value);
+      const title = titleInput.value.trim();
+      const dateVal = dateInput.value;
+      if (!title) {
+        new Notice("Event title is required");
+        titleInput.focus();
+        return;
+      }
+      if (!dateVal) {
+        new Notice("Event date is required");
+        dateInput.focus();
+        return;
+      }
+      saveBtn.disabled = true;
+      try {
+        await onSubmit(title, dateVal, timeInput.value, descInput.value);
+      } finally {
+        saveBtn.disabled = false;
+      }
     };
   }
 }
