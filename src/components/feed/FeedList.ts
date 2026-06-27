@@ -3,6 +3,8 @@ import { renderAgendaCard } from "./AgendaCard";
 import { renderEventCard } from "./EventCard";
 import type { AgendaItem, EventItem, ViewMode, FeedEntry, ActiveFilter } from "../../types";
 
+const BATCH_SIZE = 15;
+
 export interface FeedListProps {
   app: App;
   container: HTMLElement;
@@ -37,25 +39,36 @@ export class FeedListComponent {
     const modeClass = viewMode === "tile" ? "tile-mode" : "feed-mode";
     const listEl = container.createDiv({ cls: `agenda-feed-entries ${modeClass}` });
 
-    for (const entry of entries) {
-      if (entry.type === "agenda") {
-        renderAgendaCard({
-          app,
-          container: listEl,
-          item: entry.item,
-          onOpenNote,
-          onDeleteNote: onDeleteAgenda,
-          onToggleTask,
-        });
-      } else {
-        renderEventCard({
-          app,
-          container: listEl,
-          item: entry.item,
-          onOpenNote,
-          onDeleteNote: onDeleteEvent,
-        });
+    let index = 0;
+    const renderBatch = () => {
+      const end = Math.min(index + BATCH_SIZE, entries.length);
+      for (; index < end; index++) {
+        const entry = entries[index];
+        if (!entry) continue;
+        if (entry.type === "agenda") {
+          renderAgendaCard({
+            app,
+            container: listEl,
+            item: entry.item,
+            onOpenNote,
+            onDeleteNote: onDeleteAgenda,
+            onToggleTask,
+          });
+        } else {
+          renderEventCard({
+            app,
+            container: listEl,
+            item: entry.item,
+            onOpenNote,
+            onDeleteNote: onDeleteEvent,
+          });
+        }
       }
-    }
+      if (index < entries.length) {
+        requestAnimationFrame(renderBatch);
+      }
+    };
+
+    renderBatch();
   }
 }
