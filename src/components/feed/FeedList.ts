@@ -31,10 +31,11 @@ export class FeedListComponent {
   }
 
   private render(): void {
-    const { app, container, entries, onOpenNote, onDeleteAgenda, onDeleteEvent, onToggleTask } = this.props;
+    const { app, container, entries, viewMode, onOpenNote, onDeleteAgenda, onDeleteEvent, onToggleTask } = this.props;
     container.empty();
 
-    const listEl = container.createDiv({ cls: "agenda-feed-entries" });
+    const modeClass = viewMode === "tile" ? "tile-mode" : "feed-mode";
+    const listEl = container.createDiv({ cls: `agenda-feed-entries ${modeClass}` });
 
     for (const entry of entries) {
       if (entry.type === "agenda") {
