@@ -9,34 +9,78 @@ export interface NavigationData {
   onSelectFilter: (filter: ActiveFilter) => void;
 }
 
+export interface NavigationProps extends NavigationData {
+  container: HTMLElement;
+}
+
 export class NavigationComponent {
   private container: HTMLElement;
   private data: NavigationData;
+  private unfinishedMenuEl: HTMLElement | null = null;
+  private allMenuEl: HTMLElement | null = null;
+  private eventsMenuEl: HTMLElement | null = null;
+  private unfinishedBadgeEl: HTMLElement | null = null;
+  private allBadgeEl: HTMLElement | null = null;
+  private eventsBadgeEl: HTMLElement | null = null;
 
-  constructor(container: HTMLElement, data: NavigationData) {
-    this.container = container;
-    this.data = data;
+  constructor(props: NavigationProps) {
+    this.container = props.container;
+    this.data = props;
     this.render();
   }
 
-  update(data: NavigationData): void {
-    this.data = data;
-    this.render();
+  private render() {
+    const viewsSection = this.container.createDiv({ cls: "agenda-section" });
+    viewsSection.createDiv({ cls: "agenda-section-title", text: "VIEWS" });
+
+    this.unfinishedMenuEl = viewsSection.createDiv({
+      cls: `agenda-menu-item ${this.data.activeFilter === "unfinished" ? "active" : ""}`,
+    });
+    const unfinLeft = this.unfinishedMenuEl.createDiv({ cls: "agenda-menu-left" });
+    unfinLeft.innerHTML = `${ICONS.task}<span>Unfinished</span>`;
+    this.unfinishedBadgeEl = this.unfinishedMenuEl.createSpan({ cls: "agenda-badge unfinished-count", text: "0" });
+    this.unfinishedMenuEl.onclick = () => this.data.onSelectFilter("unfinished");
+
+    this.allMenuEl = viewsSection.createDiv({
+      cls: `agenda-menu-item ${this.data.activeFilter === "all" ? "active" : ""}`,
+    });
+    const allLeft = this.allMenuEl.createDiv({ cls: "agenda-menu-left" });
+    allLeft.innerHTML = `${ICONS.all}<span>All</span>`;
+    this.allBadgeEl = this.allMenuEl.createSpan({ cls: "agenda-badge all-count", text: "0" });
+    this.allMenuEl.onclick = () => this.data.onSelectFilter("all");
+
+    this.eventsMenuEl = viewsSection.createDiv({
+      cls: `agenda-menu-item ${this.data.activeFilter === "events" ? "active" : ""}`,
+    });
+    const eventsLeft = this.eventsMenuEl.createDiv({ cls: "agenda-menu-left" });
+    eventsLeft.innerHTML = `${ICONS.eventIcon}<span>Events</span>`;
+    this.eventsBadgeEl = this.eventsMenuEl.createSpan({ cls: "agenda-badge events-count", text: "0" });
+    this.eventsMenuEl.onclick = () => this.data.onSelectFilter("events");
+
+    this.update(this.data);
   }
 
-  private render(): void {
-    this.container.empty();
-    const nav = this.container.createDiv({ cls: "agenda-sidebar-nav" });
+  update(data: NavigationData) {
+    this.data = data;
 
-    const addItem = (filter: ActiveFilter, label: string, icon: string) => {
-      const isActive = this.data.activeFilter === filter;
-      const el = nav.createDiv({ cls: `agenda-nav-item ${isActive ? "is-active" : ""}` });
-      el.innerHTML = `${icon}<span>${label}</span>`;
-      el.onclick = () => this.data.onSelectFilter(filter);
-    };
+    if (this.allBadgeEl) {
+      this.allBadgeEl.textContent = String(this.data.allCount);
+    }
+    if (this.unfinishedBadgeEl) {
+      this.unfinishedBadgeEl.textContent = String(this.data.unfinishedCount);
+    }
+    if (this.eventsBadgeEl) {
+      this.eventsBadgeEl.textContent = String(this.data.upcomingEventsCount);
+    }
 
-    addItem("all", "All Notes", ICONS.all);
-    addItem("unfinished", "Unfinished Tasks", ICONS.task);
-    addItem("events", "Upcoming Events", ICONS.eventIcon);
+    if (this.allMenuEl) {
+      this.allMenuEl.toggleClass("active", this.data.activeFilter === "all");
+    }
+    if (this.unfinishedMenuEl) {
+      this.unfinishedMenuEl.toggleClass("active", this.data.activeFilter === "unfinished");
+    }
+    if (this.eventsMenuEl) {
+      this.eventsMenuEl.toggleClass("active", this.data.activeFilter === "events");
+    }
   }
 }

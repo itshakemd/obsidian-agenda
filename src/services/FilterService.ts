@@ -11,7 +11,13 @@ export class FilterService {
   ): FeedEntry[] {
     let entries: FeedEntry[] = [];
 
-    if (activeFilter === "tag") {
+    if (activeFilter === "events") {
+      entries = events.map((ev) => ({ type: "event", item: ev, sortDate: ev.eventDate }));
+    } else if (activeFilter === "unfinished") {
+      entries = agendaItems
+        .filter((m) => !isPathExcluded(m.folderPath) && m.hasUnfinishedTasks)
+        .map((m) => ({ type: "agenda", item: m, sortDate: m.date }));
+    } else if (activeFilter === "tag") {
       const tagAgenda = agendaItems
         .filter((m) => !isPathExcluded(m.folderPath) && m.tags.includes(filterValue))
         .map((m) => ({ type: "agenda" as const, item: m, sortDate: m.date }));
@@ -46,7 +52,46 @@ export class FilterService {
     return entries;
   }
 
+  static getUpcomingEventsCount(events: EventItem[]): number {
+    const todayKey = toDateKey(new Date());
+    return events.filter((ev) => ev.eventDateKey >= todayKey).length;
+  }
+
+  static getUnfinishedCount(agendaItems: AgendaItem[], isPathExcluded: (path: string) => boolean): number {
+    return agendaItems.filter((m) => !isPathExcluded(m.folderPath) && m.hasUnfinishedTasks).length;
+  }
+
   static getVisibleAgendaItems(agendaItems: AgendaItem[], isPathExcluded: (path: string) => boolean): AgendaItem[] {
     return agendaItems.filter((m) => !isPathExcluded(m.folderPath));
+  }
+
+  static getTagCounts(agendaItems: AgendaItem[], isPathExcluded: (path: string) => boolean): Record<string, number> {
+    const tagCount: Record<string, number> = {};
+    for (const m of agendaItems) {
+      if (!isPathExcluded(m.folderPath)) {
+        for (const t of m.tags) {
+          tagCount[t] = (tagCount[t] || 0) + 1;
+        }
+      }
+    }
+    return tagCount;
+  }
+
+  static getDaysWithAgenda(agendaItems: AgendaItem[], isPathExcluded: (path: string) => boolean): Set<string> {
+    const set = new Set<string>();
+    for (const m of agendaItems) {
+      if (!isPathExcluded(m.folderPath)) {
+        set.add(m.dateKey);
+      }
+    }
+    return set;
+  }
+
+  static getDaysWithEvents(events: EventItem[]): Set<string> {
+    const set = new Set<string>();
+    for (const ev of events) {
+      set.add(ev.eventDateKey);
+    }
+    return set;
   }
 }
