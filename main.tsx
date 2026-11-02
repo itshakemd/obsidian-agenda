@@ -1,6 +1,7 @@
 import { Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, type AgendaSettings } from "./src/settings";
 import { AgendaView, AGENDAVIEW_VIEW_TYPE } from "./src/view/AgendaView";
+import "./src/App.css";
 
 export default class AgendaPlugin extends Plugin {
   settings: AgendaSettings = { ...DEFAULT_SETTINGS };
