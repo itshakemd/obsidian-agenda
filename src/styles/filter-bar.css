@@ -1,0 +1,84 @@
+
+.agenda-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+
+.agenda-filter-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agenda-filter-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.agenda-filter-clear {
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 5px);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.agenda-filter-clear:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+
+.agenda-view-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--background-modifier-hover);
+  border-radius: var(--radius-s, 6px);
+  padding: 2px;
+}
+
+.agenda-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s, 4px);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.agenda-view-btn span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.agenda-view-btn svg {
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+
+.agenda-view-btn:hover {
+  background: var(--background-modifier-border);
+  color: var(--text-normal);
+}
+
+.agenda-view-btn.active {
+  background: var(--background-primary);
+  color: var(--interactive-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
