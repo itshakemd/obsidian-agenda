@@ -6,6 +6,12 @@
   padding: 16px 0;
 }
 
+.agenda-feed-entries.tile-mode {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
 .agenda-card {
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
@@ -54,4 +60,10 @@
 .agenda-task-item.is-checked .agenda-task-text {
   text-decoration: line-through;
   color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .agenda-feed-entries.tile-mode {
+    grid-template-columns: 1fr;
+  }
 }
