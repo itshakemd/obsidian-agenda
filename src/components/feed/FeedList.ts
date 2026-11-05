@@ -36,6 +36,13 @@ export class FeedListComponent {
     const { app, container, entries, viewMode, onOpenNote, onDeleteAgenda, onDeleteEvent, onToggleTask } = this.props;
     container.empty();
 
+    if (entries.length === 0) {
+      const empty = container.createDiv({ cls: "agenda-feed-empty" });
+      empty.createDiv({ cls: "agenda-empty-title", text: "No notes or events found" });
+      empty.createDiv({ cls: "agenda-empty-sub", text: "Create a note or adjust filters to see items here." });
+      return;
+    }
+
     const modeClass = viewMode === "tile" ? "tile-mode" : "feed-mode";
     const listEl = container.createDiv({ cls: `agenda-feed-entries ${modeClass}` });
 
