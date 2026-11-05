@@ -74,6 +74,11 @@ export class AgendaView extends ItemView {
       onClearFilter: () => this.controller.clearFilter(),
     });
 
+    this.registerEvent(this.app.vault.on("create", () => this.controller.reload()));
+    this.registerEvent(this.app.vault.on("modify", () => this.controller.reload()));
+    this.registerEvent(this.app.vault.on("delete", () => this.controller.reload()));
+    this.registerEvent(this.app.vault.on("rename", () => this.controller.reload()));
+
     this.unsubscribe = this.controller.subscribe(() => {
       this.sidebarComp?.update(this.controller.getSidebarData());
       this.filterBarComp?.update(this.controller.getFilterBarData());
