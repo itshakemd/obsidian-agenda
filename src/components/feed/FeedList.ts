@@ -21,6 +21,7 @@ export interface FeedListProps {
 
 export class FeedListComponent {
   private props: FeedListProps;
+  private currentRenderId = 0;
 
   constructor(props: FeedListProps) {
     this.props = props;
@@ -36,6 +37,8 @@ export class FeedListComponent {
     const { app, container, entries, viewMode, onOpenNote, onDeleteAgenda, onDeleteEvent, onToggleTask } = this.props;
     container.empty();
 
+    const renderId = ++this.currentRenderId;
+
     if (entries.length === 0) {
       const empty = container.createDiv({ cls: "agenda-feed-empty" });
       empty.createDiv({ cls: "agenda-empty-title", text: "No notes or events found" });
@@ -48,6 +51,7 @@ export class FeedListComponent {
 
     let index = 0;
     const renderBatch = () => {
+      if (this.currentRenderId !== renderId) return;
       const end = Math.min(index + BATCH_SIZE, entries.length);
       for (; index < end; index++) {
         const entry = entries[index];
@@ -71,7 +75,7 @@ export class FeedListComponent {
           });
         }
       }
-      if (index < entries.length) {
+      if (index < entries.length && this.currentRenderId === renderId) {
         requestAnimationFrame(renderBatch);
       }
     };
