@@ -9,59 +9,150 @@ export interface FilterHooks {
   selectDate(dayKey: string): void;
   changeMonth(delta: number): void;
   setViewMode(mode: ViewMode): void;
-  getFilteredEntries(): FeedEntry[];
-  isPathExcluded(path: string): boolean;
-  toggleExcludeFolder(folderPath: string, excluded: boolean): Promise<void>;
+  setShowEventComposer(show: boolean): void;
+  isPathExcluded(folderPath: string): boolean;
+  toggleFolderExclusion(folderPath: string, excluded: boolean): Promise<void>;
+  getFeedEntries(): FeedEntry[];
+  getVisibleAgendaCount(): number;
+  getUnfinishedCount(): number;
+  getUpcomingEventsCount(): number;
+  getTagCounts(): Record<string, number>;
+  getSortedTags(): { tag: string; count: number }[];
+  getDaysWithAgenda(): Set<string>;
+  getDaysWithEvents(): Set<string>;
+  getFilterTitle(): string;
 }
 
-export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks {
-  const isPathExcluded = (path: string) => {
-    return plugin.settings.excludedFolders.some((f) => path === f || path.startsWith(f + "/"));
-  };
+export function useFilter(plugin: AgendaPlugin, store: AgendaStore): FilterHooks {
+  function isPathExcluded(folderPath: string): boolean {
+    const list = plugin.settings.excludedFolders || [];
+    return list.some((excluded) => folderPath === excluded || folderPath.startsWith(`${excluded}/`));
+  }
 
-  const toggleExcludeFolder = async (folderPath: string, excluded: boolean) => {
-    const set = new Set(plugin.settings.excludedFolders);
-    if (excluded) {
-      set.add(folderPath);
+  function setFilter(filter: ActiveFilter, value = ""): void {
+    const state = store.getState();
+    if (state.activeFilter === filter && state.filterValue === value) {
+      store.setState({ activeFilter: "all", filterValue: "" });
     } else {
-      set.delete(folderPath);
+      store.setState({ activeFilter: filter, filterValue: value });
     }
-    plugin.settings.excludedFolders = Array.from(set);
-    await plugin.saveSettings();
-    store.setState({});
-  };
+  }
 
-  const setFilter = (filter: ActiveFilter, value = "") => {
-    store.setState({ activeFilter: filter, filterValue: value });
-  };
-
-  const clearFilter = () => {
+  function clearFilter(): void {
     store.setState({ activeFilter: "all", filterValue: "" });
-  };
+  }
 
-  const selectDate = (dayKey: string) => {
-    const s = store.getState();
-    if (s.activeFilter === "date" && s.filterValue === dayKey) {
-      clearFilter();
+  function selectDate(dayKey: string): void {
+    const state = store.getState();
+    if (state.activeFilter === "date" && state.filterValue === dayKey) {
+      store.setState({ activeFilter: "all", filterValue: "" });
     } else {
-      setFilter("date", dayKey);
+      store.setState({ activeFilter: "date", filterValue: dayKey });
     }
-  };
+  }
 
-  const changeMonth = (delta: number) => {
-    const current = store.getState().calendarDate;
-    const next = new Date(current.getFullYear(), current.getMonth() + delta, 1);
-    store.setState({ calendarDate: next });
-  };
+  function changeMonth(delta: number): void {
+    const { calendarDate } = store.getState();
+    const newDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + delta, 1);
+    store.setState({ calendarDate: newDate });
+  }
 
-  const setViewMode = (mode: ViewMode) => {
-    store.setState({ viewMode: mode });
-  };
+  function setViewMode(mode: ViewMode): void {
+    if (store.getState().viewMode !== mode) {
+      store.setState({ viewMode: mode });
+    }
+  }
 
-  const getFilteredEntries = (): FeedEntry[] => {
-    const s = store.getState();
-    return FilterService.getFeedEntries(s.agendaItems, s.events, s.activeFilter, s.filterValue, isPathExcluded);
-  };
+  function setShowEventComposer(show: boolean): void {
+    if (store.getState().showEventComposer !== show) {
+      store.setState({ showEventComposer: show });
+    }
+  }
+
+  async function toggleFolderExclusion(folderPath: string, excluded: boolean): Promise<void> {
+    const list = plugin.settings.excludedFolders || [];
+    if (!excluded) {
+      plugin.settings.excludedFolders = list.filter((p) => p !== folderPath);
+    } else {
+      if (!list.includes(folderPath)) {
+        plugin.settings.excludedFolders = [...list, folderPath];
+      }
+    }
+    await plugin.saveSettings();
+    store.notify();
+  }
+
+
+  function getFeedEntries(): FeedEntry[] {
+    const state = store.getState();
+    return FilterService.getFeedEntries(
+      state.agendaItems,
+      state.events,
+      state.activeFilter,
+      state.filterValue,
+      isPathExcluded
+    );
+  }
+
+  function getVisibleAgendaCount(): number {
+    const state = store.getState();
+    return FilterService.getVisibleAgendaItems(state.agendaItems, isPathExcluded).length;
+  }
+
+  function getUnfinishedCount(): number {
+    const state = store.getState();
+    return FilterService.getUnfinishedCount(state.agendaItems, isPathExcluded);
+  }
+
+  function getUpcomingEventsCount(): number {
+    const state = store.getState();
+    return FilterService.getUpcomingEventsCount(state.events);
+  }
+
+  function getTagCounts(): Record<string, number> {
+    const state = store.getState();
+    return FilterService.getTagCounts(state.agendaItems, isPathExcluded);
+  }
+
+  function getSortedTags(): { tag: string; count: number }[] {
+    const counts = getTagCounts();
+    return Object.keys(counts)
+      .sort((a, b) => counts[b] - counts[a])
+      .map((tag) => ({ tag, count: counts[tag] }));
+  }
+
+  function getDaysWithAgenda(): Set<string> {
+    const state = store.getState();
+    return FilterService.getDaysWithAgenda(state.agendaItems, isPathExcluded);
+  }
+
+  function getDaysWithEvents(): Set<string> {
+    const state = store.getState();
+    return FilterService.getDaysWithEvents(state.events);
+  }
+
+  function getFilterTitle(): string {
+    const { activeFilter, filterValue } = store.getState();
+    switch (activeFilter) {
+      case "all":
+        return "Agenda";
+      case "unfinished":
+        return "Unfinished";
+      case "events":
+        return "Events";
+      case "tag":
+        return `Tag: #${filterValue}`;
+      case "folder":
+        return `Folder: ${filterValue}`;
+      case "date": {
+        const [y, m, d] = filterValue.split("-");
+        const dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        return dateObj.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" });
+      }
+      default:
+        return "Agenda";
+    }
+  }
 
   return {
     setFilter,
@@ -69,8 +160,17 @@ export function useFilter(store: AgendaStore, plugin: AgendaPlugin): FilterHooks
     selectDate,
     changeMonth,
     setViewMode,
-    getFilteredEntries,
+    setShowEventComposer,
     isPathExcluded,
-    toggleExcludeFolder,
+    toggleFolderExclusion,
+    getFeedEntries,
+    getVisibleAgendaCount,
+    getUnfinishedCount,
+    getUpcomingEventsCount,
+    getTagCounts,
+    getSortedTags,
+    getDaysWithAgenda,
+    getDaysWithEvents,
+    getFilterTitle,
   };
 }
