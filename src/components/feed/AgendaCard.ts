@@ -14,7 +14,7 @@ export interface AgendaCardProps {
 }
 
 export function renderAgendaCard(props: AgendaCardProps): void {
-  const { container, item, onOpenNote, onToggleTask } = props;
+  const { app, container, item, onOpenNote, onToggleTask } = props;
 
   const card = container.createDiv({ cls: "agenda-card" });
 
@@ -53,6 +53,9 @@ export function renderAgendaCard(props: AgendaCardProps): void {
         e.stopPropagation();
         onOpenNote(link.url);
       };
+      chip.addEventListener("mouseover", (event) => {
+        app.workspace.trigger("link-hover", chip, event.target, link.url, item.path);
+      });
     }
   }
 }
