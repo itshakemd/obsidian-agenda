@@ -1,6 +1,7 @@
 import type { App } from "obsidian";
 import { formatAgendaTime } from "../../utils/date";
 import { renderInlineFormatting } from "../../utils/markdown";
+import { ICONS } from "../../constants/icons";
 import type { AgendaItem } from "../../types";
 
 export interface AgendaCardProps {
@@ -40,6 +41,18 @@ export function renderAgendaCard(props: AgendaCardProps): void {
       taskRow.createSpan({ cls: "agenda-task-text" }).innerHTML = renderInlineFormatting(m[3] ?? "");
     } else if (line.trim()) {
       body.createDiv({ cls: "agenda-text-line" }).innerHTML = renderInlineFormatting(line);
+    }
+  }
+
+  if (item.links && item.links.length > 0) {
+    const linksRow = card.createDiv({ cls: "agenda-card-links" });
+    for (const link of item.links) {
+      const chip = linksRow.createDiv({ cls: "agenda-link-chip" });
+      chip.innerHTML = `${ICONS.link}<span>${link.title}</span>`;
+      chip.onclick = (e) => {
+        e.stopPropagation();
+        onOpenNote(link.url);
+      };
     }
   }
 }
