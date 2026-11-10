@@ -15,5 +15,13 @@ export function renderImageGallery(
     const imgEl = itemEl.createEl("img", {
       attr: { src: imgData.src, alt: imgData.alt || "Note Image" },
     });
+
+    if (imgData.file && onOpenFile) {
+      itemEl.style.cursor = "pointer";
+      itemEl.onclick = (e) => {
+        e.stopPropagation();
+        if (imgData.file) onOpenFile(imgData.file.path);
+      };
+    }
   }
 }
