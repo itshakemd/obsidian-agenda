@@ -49,13 +49,27 @@ export class FeedListComponent {
     const modeClass = viewMode === "tile" ? "tile-mode" : "feed-mode";
     const listEl = container.createDiv({ cls: `agenda-feed-entries ${modeClass}` });
 
+    let lastDateKey = "";
     let index = 0;
+
     const renderBatch = () => {
       if (this.currentRenderId !== renderId) return;
       const end = Math.min(index + BATCH_SIZE, entries.length);
       for (; index < end; index++) {
         const entry = entries[index];
         if (!entry) continue;
+
+        const dateKey = entry.sortDate.toLocaleDateString([], {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
+
+        if (viewMode !== "tile" && dateKey !== lastDateKey) {
+          lastDateKey = dateKey;
+          listEl.createDiv({ cls: "agenda-date-divider", text: dateKey });
+        }
+
         if (entry.type === "agenda") {
           renderAgendaCard({
             app,
