@@ -23,9 +23,12 @@ export function formatAgendaTime(d: Date): string {
 }
 
 export function formatEventDateTime(eventDate: Date, eventTime: string | null): string {
+  const now = new Date();
   const formattedEventDate = eventDate.toLocaleDateString([], {
+    weekday: "short",
     month: "short",
     day: "numeric",
+    year: eventDate.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
   });
   return eventTime ? `${formattedEventDate} at ${eventTime}` : formattedEventDate;
 }
