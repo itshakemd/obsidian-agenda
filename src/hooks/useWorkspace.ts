@@ -9,29 +9,20 @@ export interface WorkspaceHooks {
 }
 
 export function useWorkspace(app: App): WorkspaceHooks {
-  const openNote = (path: string, inTab = false) => {
-    const file = app.vault.getAbstractFileByPath(path);
-    if (!file) {
-      new Notice("Note not found");
-      return;
-    }
-    const leaf = inTab ? app.workspace.getLeaf("tab") : app.workspace.getLeaf();
-    leaf.openFile(file as any);
-  };
+  function openNote(path: string, inTab = true): void {
+    app.workspace.openLinkText(path, "", inTab ? "tab" : false);
+  }
 
-  const copyText = async (text: string, noticeMsg = "Copied to clipboard") => {
+  async function copyText(text: string, noticeMsg = "Copied to clipboard"): Promise<void> {
     await navigator.clipboard.writeText(text);
     new Notice(noticeMsg);
-  };
+  }
 
-  const copyEvent = async (event: EventItem) => {
-    const timeFormatted = formatEventDateTime(event.eventDate, event.eventTime);
-    let text = `Event: ${event.title}\nDate: ${timeFormatted}`;
-    if (event.description) {
-      text += `\n\n${event.description}`;
-    }
-    await copyText(text, "Event copied to clipboard");
-  };
+  async function copyEvent(event: EventItem): Promise<void> {
+    const dateStr = formatEventDateTime(event.eventDate, event.eventTime);
+    const text = `${event.title}\n${dateStr}\n\n${event.description}`;
+    await copyText(text);
+  }
 
   return {
     openNote,
