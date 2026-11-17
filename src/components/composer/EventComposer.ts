@@ -1,4 +1,3 @@
-import { Notice } from "obsidian";
 import { toDateKey } from "../../utils/date";
 
 export interface EventComposerProps {
@@ -9,64 +8,86 @@ export interface EventComposerProps {
 
 export class EventComposerComponent {
   private props: EventComposerProps;
+  private titleInput: HTMLInputElement | null = null;
+  private dateInput: HTMLInputElement | null = null;
+  private timeInput: HTMLInputElement | null = null;
+  private descInput: HTMLTextAreaElement | null = null;
+  private saveBtn: HTMLButtonElement | null = null;
 
   constructor(props: EventComposerProps) {
     this.props = props;
     this.render();
   }
 
-  private render(): void {
-    const { container, onSubmit, onCancel } = this.props;
-    container.empty();
+  private render() {
+    this.props.container.empty();
+    const composer = this.props.container.createDiv({ cls: "agenda-composer agenda-event-composer" });
 
-    const box = container.createDiv({ cls: "agenda-event-composer-box" });
-    box.createEl("h4", { text: "New Event" });
+    const header = composer.createDiv({ cls: "agenda-event-composer-header" });
+    header.createSpan({ cls: "agenda-event-composer-title", text: "New Event" });
 
-    const titleInput = box.createEl("input", {
+    const fields = composer.createDiv({ cls: "agenda-event-fields" });
+
+    const titleRow = fields.createDiv({ cls: "agenda-event-field-row" });
+    titleRow.createEl("label", { cls: "agenda-event-label", text: "Title" });
+    this.titleInput = titleRow.createEl("input", {
       cls: "agenda-event-input",
-      attr: { placeholder: "Event Title" },
+      type: "text",
+      placeholder: "Event title...",
     });
 
-    const row = box.createDiv({ cls: "agenda-event-row" });
-    const dateInput = row.createEl("input", {
-      type: "date",
-      cls: "agenda-event-date-picker",
-      value: toDateKey(new Date()),
-    });
-    const timeInput = row.createEl("input", {
-      type: "time",
-      cls: "agenda-event-time-picker",
+    const dateRow = fields.createDiv({ cls: "agenda-event-field-row" });
+    dateRow.createEl("label", { cls: "agenda-event-label", text: "Date" });
+    this.dateInput = dateRow.createEl("input", { cls: "agenda-event-input", type: "date" });
+    this.dateInput.value = toDateKey(new Date());
+
+    const timeRow = fields.createDiv({ cls: "agenda-event-field-row" });
+    timeRow.createEl("label", { cls: "agenda-event-label", text: "Time" });
+    this.timeInput = timeRow.createEl("input", { cls: "agenda-event-input agenda-event-time-input", type: "time" });
+
+    const descRow = fields.createDiv({ cls: "agenda-event-field-row agenda-event-desc-row" });
+    descRow.createEl("label", { cls: "agenda-event-label", text: "Notes" });
+    this.descInput = descRow.createEl("textarea", {
+      cls: "agenda-textarea agenda-event-desc-textarea",
+      placeholder: "Optional description...",
     });
 
-    const descInput = box.createEl("textarea", {
-      cls: "agenda-event-desc",
-      attr: { placeholder: "Event description..." },
-    });
+    const toolbar = composer.createDiv({ cls: "agenda-composer-toolbar" });
+    const leftSide = toolbar.createDiv();
+    const cancelBtn = leftSide.createEl("button", { cls: "agenda-filter-clear", text: "Cancel" });
+    cancelBtn.onclick = () => this.props.onCancel();
 
-    const actions = box.createDiv({ cls: "agenda-event-actions" });
-    const cancelBtn = actions.createEl("button", { cls: "agenda-composer-btn", text: "Cancel" });
-    cancelBtn.onclick = () => onCancel();
+    const actions = toolbar.createDiv({ cls: "agenda-toolbar-actions" });
+    this.saveBtn = actions.createEl("button", { cls: "agenda-btn-save", text: "Save Event" });
+    this.saveBtn.onclick = () => this.handleSubmit();
+  }
 
-    const saveBtn = actions.createEl("button", { cls: "agenda-composer-submit-btn", text: "Save Event" });
-    saveBtn.onclick = async () => {
-      const title = titleInput.value.trim();
-      const dateVal = dateInput.value;
-      if (!title) {
-        new Notice("Event title is required");
-        titleInput.focus();
-        return;
-      }
-      if (!dateVal) {
-        new Notice("Event date is required");
-        dateInput.focus();
-        return;
-      }
-      saveBtn.disabled = true;
-      try {
-        await onSubmit(title, dateVal, timeInput.value, descInput.value);
-      } finally {
-        saveBtn.disabled = false;
-      }
-    };
+  private async handleSubmit() {
+    if (!this.titleInput || !this.dateInput || !this.timeInput || !this.descInput || !this.saveBtn) return;
+
+    this.saveBtn.disabled = true;
+    this.saveBtn.textContent = "Saving...";
+
+    const success = await this.props.onSubmit(
+      this.titleInput.value,
+      this.dateInput.value,
+      this.timeInput.value,
+      this.descInput.value
+    );
+
+    this.saveBtn.disabled = false;
+    this.saveBtn.textContent = "Save Event";
+
+    if (success) {
+      this.resetForm();
+    }
+  }
+
+  private resetForm() {
+    if (!this.titleInput || !this.dateInput || !this.timeInput || !this.descInput) return;
+    this.titleInput.value = "";
+    this.timeInput.value = "";
+    this.descInput.value = "";
+    this.dateInput.value = toDateKey(new Date());
   }
 }

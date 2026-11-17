@@ -1,4 +1,3 @@
-import { Notice } from "obsidian";
 import { ICONS } from "../../constants/icons";
 import { createComposerLogic, type ComposerLogic } from "../../hooks/useComposer";
 
@@ -11,55 +10,77 @@ export interface AgendaComposerProps {
 export class AgendaComposerComponent {
   private props: AgendaComposerProps;
   private textarea: HTMLTextAreaElement | null = null;
-  private logic: ComposerLogic | null = null;
+  private saveBtn: HTMLButtonElement | null = null;
+  private composerLogic: ComposerLogic;
 
   constructor(props: AgendaComposerProps) {
     this.props = props;
+    this.composerLogic = createComposerLogic(() => this.textarea);
     this.render();
   }
 
-  private render(): void {
-    const { container, onSubmit, onToggleEventComposer } = this.props;
-    container.empty();
+  private render() {
+    const composer = this.props.container.createDiv({ cls: "agenda-composer" });
 
-    const composerBox = container.createDiv({ cls: "agenda-composer-box" });
-    const ta = composerBox.createEl("textarea", {
-      cls: "agenda-composer-textarea",
-      attr: { placeholder: "Write note, add #tags, todos (- [ ])..." },
+    this.textarea = composer.createEl("textarea", {
+      cls: "agenda-textarea",
+      placeholder: "What's on your agenda?...",
     });
-    this.textarea = ta;
-    this.logic = createComposerLogic(ta);
 
-    const toolbar = composerBox.createDiv({ cls: "agenda-composer-toolbar" });
-    const tools = toolbar.createDiv({ cls: "agenda-composer-tools" });
+    this.textarea.addEventListener("keydown", (e) => {
+      this.composerLogic.handleKeyDown(e, () => this.handleSubmit());
+    });
 
-    const btnTag = tools.createEl("button", { cls: "agenda-composer-btn", text: "#" });
-    btnTag.onclick = () => this.logic?.insertTag();
+    const toolbar = composer.createDiv({ cls: "agenda-composer-toolbar" });
+    const tools = toolbar.createDiv({ cls: "agenda-toolbar-tools" });
 
-    const btnTodo = tools.createEl("button", { cls: "agenda-composer-btn" });
-    btnTodo.innerHTML = ICONS.task;
-    btnTodo.onclick = () => this.logic?.insertTodo();
+    const tagTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add tag" });
+    tagTool.textContent = "#";
+    tagTool.onclick = () => this.composerLogic.insertTag();
 
-    const actions = toolbar.createDiv({ cls: "agenda-composer-actions" });
-    const eventBtn = actions.createEl("button", { cls: "agenda-composer-btn" });
-    eventBtn.innerHTML = ICONS.calendarPlus;
-    eventBtn.onclick = () => onToggleEventComposer();
+    const todoTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add todo task" });
+    todoTool.innerHTML = ICONS.checkSquare;
+    todoTool.onclick = () => this.composerLogic.insertTodo();
 
-    const submitBtn = actions.createEl("button", { cls: "agenda-composer-submit-btn", text: "Save Note" });
-    submitBtn.onclick = async () => {
-      const text = ta.value.trim();
-      if (!text) {
-        new Notice("Please enter note content before saving");
-        ta.focus();
-        return;
-      }
-      submitBtn.disabled = true;
-      try {
-        const ok = await onSubmit(text);
-        if (ok) ta.value = "";
-      } finally {
-        submitBtn.disabled = false;
-      }
-    };
+    const linkTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add link" });
+    linkTool.innerHTML = ICONS.link;
+    linkTool.onclick = () => this.composerLogic.insertLink();
+
+    const codeTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add code" });
+    codeTool.innerHTML = ICONS.code;
+    codeTool.onclick = () => this.composerLogic.insertCode();
+
+    const eventToggle = tools.createEl("button", {
+      cls: "agenda-tool-btn agenda-event-toggle-btn",
+      title: "Add Event",
+    });
+    eventToggle.innerHTML = ICONS.calendarPlus;
+    eventToggle.onclick = () => this.props.onToggleEventComposer();
+
+    const actions = toolbar.createDiv({ cls: "agenda-toolbar-actions" });
+
+    this.saveBtn = actions.createEl("button", { cls: "agenda-btn-save", text: "Save" });
+    this.saveBtn.onclick = () => this.handleSubmit();
+  }
+
+  private async handleSubmit() {
+    if (!this.textarea || !this.saveBtn) return;
+
+    this.saveBtn.disabled = true;
+    this.saveBtn.textContent = "Saving...";
+
+    const success = await this.props.onSubmit(this.textarea.value);
+
+    this.saveBtn.disabled = false;
+    this.saveBtn.textContent = "Save";
+
+    if (success && this.textarea) {
+      this.textarea.value = "";
+    }
+  }
+
+  focus() {
+    this.textarea?.focus();
+    this.textarea?.scrollIntoView({ behavior: "smooth" });
   }
 }
