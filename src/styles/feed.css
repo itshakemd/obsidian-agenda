@@ -297,9 +297,6 @@
 .agenda-event-datetime {
   color: var(--text-accent) !important;
   font-weight: 600 !important;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .agenda-event-title {

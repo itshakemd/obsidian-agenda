@@ -201,28 +201,4 @@ export class AgendaController {
   getDaysWithEvents(): Set<string> {
     return this.filterHooks.getDaysWithEvents();
   }
-
-  getSidebarData(): any {
-    return {
-      calendarDate: this.calendarDate,
-      daysWithAgenda: this.getDaysWithAgenda(),
-      daysWithEvents: this.getDaysWithEvents(),
-      allCount: this.getVisibleAgendaCount(),
-      unfinishedCount: this.getUnfinishedCount(),
-      upcomingEventsCount: this.getUpcomingEventsCount(),
-      folders: this.folders,
-      tags: this.getSortedTags(),
-      activeFilter: this.activeFilter,
-      filterValue: this.filterValue,
-      isPathExcluded: this.isPathExcluded,
-      onSelectBrand: () => this.clearFilter(),
-      onNewEntryClick: () => this.setShowEventComposer(false),
-      onSelectDate: (k: string) => this.selectDate(k),
-      onChangeMonth: (d: number) => this.changeMonth(d),
-      onSelectFilter: (f: any) => this.setFilter(f),
-      onToggleExclude: (p: string, e: boolean) => this.toggleFolderExclusion(p, e),
-      onSelectFolder: (p: string) => this.setFilter("folder", p),
-      onSelectTag: (t: string) => this.setFilter("tag", t),
-    };
-  }
 }
