@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "moment": "^2.31.0",
     "obsidian": "^1.13.1"
+  },
+  "overrides": {
+    "moment": "^2.31.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
