@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import type { FolderCount } from "../../types";
 
 export interface FoldersListData {
@@ -33,7 +33,7 @@ export class FoldersListComponent {
     header.createSpan({ cls: "agenda-section-title", text: "FOLDERS" });
 
     this.chevronEl = header.createSpan({ cls: `agenda-section-chevron ${this.isCollapsed ? "collapsed" : ""}` });
-    this.chevronEl.innerHTML = ICONS.chevronSm;
+    renderIcon(this.chevronEl, ICONS.chevronSm);
 
     this.listEl = section.createDiv({ cls: `agenda-folders-list ${this.isCollapsed ? "collapsed" : ""}` });
 
@@ -53,11 +53,7 @@ export class FoldersListComponent {
     this.listEl.empty();
 
     if (this.data.folders.length === 0) {
-      const emptyMsg = this.listEl.createDiv();
-      emptyMsg.style.fontSize = "12px";
-      emptyMsg.style.color = "var(--text-faint)";
-      emptyMsg.style.padding = "4px 8px";
-      emptyMsg.textContent = "No folders";
+      this.listEl.createDiv({ cls: "agenda-empty-subtext", text: "No folders" });
       return;
     }
 
@@ -84,7 +80,8 @@ export class FoldersListComponent {
       };
 
       const folderNameSpan = left.createSpan({ cls: "agenda-folder-name" });
-      folderNameSpan.innerHTML = `${ICONS.folder}<span>${folder.name}</span>`;
+      renderIcon(folderNameSpan, ICONS.folder);
+      folderNameSpan.createSpan({ text: folder.name });
 
       item.createSpan({ cls: "agenda-badge", text: String(folder.count) });
 

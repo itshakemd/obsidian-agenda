@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import type { ActiveFilter } from "../../types";
 
 export interface NavigationData {
@@ -37,7 +37,8 @@ export class NavigationComponent {
       cls: `agenda-menu-item ${this.data.activeFilter === "unfinished" ? "active" : ""}`,
     });
     const unfinLeft = this.unfinishedMenuEl.createDiv({ cls: "agenda-menu-left" });
-    unfinLeft.innerHTML = `${ICONS.task}<span>Unfinished</span>`;
+    renderIcon(unfinLeft, ICONS.task);
+    unfinLeft.createSpan({ text: "Unfinished" });
     this.unfinishedBadgeEl = this.unfinishedMenuEl.createSpan({ cls: "agenda-badge unfinished-count", text: "0" });
     this.unfinishedMenuEl.onclick = () => this.data.onSelectFilter("unfinished");
 
@@ -45,7 +46,8 @@ export class NavigationComponent {
       cls: `agenda-menu-item ${this.data.activeFilter === "all" ? "active" : ""}`,
     });
     const allLeft = this.allMenuEl.createDiv({ cls: "agenda-menu-left" });
-    allLeft.innerHTML = `${ICONS.all}<span>All</span>`;
+    renderIcon(allLeft, ICONS.all);
+    allLeft.createSpan({ text: "All" });
     this.allBadgeEl = this.allMenuEl.createSpan({ cls: "agenda-badge all-count", text: "0" });
     this.allMenuEl.onclick = () => this.data.onSelectFilter("all");
 
@@ -53,7 +55,8 @@ export class NavigationComponent {
       cls: `agenda-menu-item ${this.data.activeFilter === "events" ? "active" : ""}`,
     });
     const eventsLeft = this.eventsMenuEl.createDiv({ cls: "agenda-menu-left" });
-    eventsLeft.innerHTML = `${ICONS.eventIcon}<span>Events</span>`;
+    renderIcon(eventsLeft, ICONS.eventIcon);
+    eventsLeft.createSpan({ text: "Events" });
     this.eventsBadgeEl = this.eventsMenuEl.createSpan({ cls: "agenda-badge events-count", text: "0" });
     this.eventsMenuEl.onclick = () => this.data.onSelectFilter("events");
 

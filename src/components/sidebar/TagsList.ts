@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 
 export interface TagItemData {
   tag: string;
@@ -35,7 +35,7 @@ export class TagsListComponent {
     header.createSpan({ cls: "agenda-section-title", text: "TAGS" });
 
     this.chevronEl = header.createSpan({ cls: `agenda-section-chevron ${this.isCollapsed ? "collapsed" : ""}` });
-    this.chevronEl.innerHTML = ICONS.chevronSm;
+    renderIcon(this.chevronEl, ICONS.chevronSm);
 
     this.listEl = section.createDiv({ cls: `agenda-tags-list ${this.isCollapsed ? "collapsed" : ""}` });
 
@@ -55,11 +55,7 @@ export class TagsListComponent {
     this.listEl.empty();
 
     if (this.data.tags.length === 0) {
-      const emptyMsg = this.listEl.createDiv();
-      emptyMsg.style.fontSize = "12px";
-      emptyMsg.style.color = "var(--text-faint)";
-      emptyMsg.style.padding = "4px 8px";
-      emptyMsg.textContent = "No tags yet";
+      this.listEl.createDiv({ cls: "agenda-empty-subtext", text: "No tags yet" });
       return;
     }
 
@@ -70,7 +66,8 @@ export class TagsListComponent {
       });
 
       const left = item.createDiv({ cls: "agenda-tag-left" });
-      left.innerHTML = `<span class="agenda-tag-hash">#</span><span>${tag}</span>`;
+      left.createSpan({ cls: "agenda-tag-hash", text: "#" });
+      left.createSpan({ text: tag });
 
       item.createSpan({ cls: "agenda-badge", text: String(count) });
 

@@ -1,5 +1,5 @@
 import { Menu, type App } from "obsidian";
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import { formatAgendaTime } from "../../utils/date";
 import { extractImages, renderInlineFormatting, isContentLong } from "../../utils/markdown";
 import { renderImageGallery } from "./ImageGallery";
@@ -62,7 +62,7 @@ export function renderAgendaCard(props: AgendaCardProps): HTMLElement {
 
   const headerActions = header.createDiv({ cls: "agenda-card-header-actions" });
   const menuBtn = headerActions.createEl("button", { cls: "agenda-card-menu-btn", title: "More options" });
-  menuBtn.innerHTML = ICONS.more;
+  renderIcon(menuBtn, ICONS.more);
   menuBtn.onclick = (e) => {
     const menu = new Menu();
     menu.addItem((menuItem) => {
@@ -92,7 +92,7 @@ export function renderAgendaCard(props: AgendaCardProps): HTMLElement {
 
   const body = card.createDiv({ cls: "agenda-card-body" });
   if (item.title && !item.title.startsWith("Agenda ")) {
-    const noteTitle = body.createEl("div", { cls: "agenda-card-note-title", text: item.title });
+    const noteTitle = body.createDiv({ cls: "agenda-card-note-title", text: item.title });
     noteTitle.onclick = () => onOpenNote(item.file.path, true);
   }
 
@@ -172,7 +172,7 @@ function renderAgendaBodyContent(
       linkCard.rel = "noopener noreferrer";
 
       const iconBox = linkCard.createDiv({ cls: "agenda-link-icon-box" });
-      iconBox.innerHTML = ICONS.link;
+      renderIcon(iconBox, ICONS.link);
 
       const info = linkCard.createDiv({ cls: "agenda-link-info" });
       info.createSpan({ cls: "agenda-link-title", text: fullLinkMatch[1] });

@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import type { ViewMode } from "../../types";
 
 export interface FilterBarData {
@@ -35,7 +35,7 @@ export class FilterBarComponent {
 
     this.clearBtn = left.createEl("button", { cls: "agenda-filter-clear", text: "Show All" });
     this.clearBtn.onclick = () => this.data.onClearFilter();
-    this.clearBtn.style.display = this.data.isFiltered ? "" : "none";
+    this.clearBtn.toggleClass("is-hidden", !this.data.isFiltered);
 
     const switcher = this.container.createDiv({ cls: "agenda-view-switcher" });
 
@@ -43,14 +43,14 @@ export class FilterBarComponent {
       cls: `agenda-view-btn${this.data.viewMode === "feed" ? " active" : ""}`,
       title: "Feed view",
     });
-    this.feedBtn.createSpan().innerHTML = ICONS.feedList;
+    renderIcon(this.feedBtn.createSpan(), ICONS.feedList);
     this.feedBtn.onclick = () => this.data.onChangeViewMode("feed");
 
     this.tileBtn = switcher.createEl("button", {
       cls: `agenda-view-btn${this.data.viewMode === "tile" ? " active" : ""}`,
       title: "Tile view",
     });
-    this.tileBtn.createSpan().innerHTML = ICONS.grid;
+    renderIcon(this.tileBtn.createSpan(), ICONS.grid);
     this.tileBtn.onclick = () => this.data.onChangeViewMode("tile");
   }
 
@@ -60,7 +60,7 @@ export class FilterBarComponent {
       this.filterTitleEl.textContent = this.data.title;
     }
     if (this.clearBtn) {
-      this.clearBtn.style.display = this.data.isFiltered ? "" : "none";
+      this.clearBtn.toggleClass("is-hidden", !this.data.isFiltered);
     }
     if (this.feedBtn) {
       this.feedBtn.toggleClass("active", this.data.viewMode === "feed");

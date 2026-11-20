@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import { createComposerLogic, type ComposerLogic } from "../../hooks/useComposer";
 
 export interface AgendaComposerProps {
@@ -28,7 +28,9 @@ export class AgendaComposerComponent {
     });
 
     this.textarea.addEventListener("keydown", (e) => {
-      this.composerLogic.handleKeyDown(e, () => this.handleSubmit());
+      this.composerLogic.handleKeyDown(e, () => {
+        void this.handleSubmit();
+      });
     });
 
     const toolbar = composer.createDiv({ cls: "agenda-composer-toolbar" });
@@ -39,28 +41,30 @@ export class AgendaComposerComponent {
     tagTool.onclick = () => this.composerLogic.insertTag();
 
     const todoTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add todo task" });
-    todoTool.innerHTML = ICONS.checkSquare;
+    renderIcon(todoTool, ICONS.checkSquare);
     todoTool.onclick = () => this.composerLogic.insertTodo();
 
     const linkTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add link" });
-    linkTool.innerHTML = ICONS.link;
+    renderIcon(linkTool, ICONS.link);
     linkTool.onclick = () => this.composerLogic.insertLink();
 
     const codeTool = tools.createEl("button", { cls: "agenda-tool-btn", title: "Add code" });
-    codeTool.innerHTML = ICONS.code;
+    renderIcon(codeTool, ICONS.code);
     codeTool.onclick = () => this.composerLogic.insertCode();
 
     const eventToggle = tools.createEl("button", {
       cls: "agenda-tool-btn agenda-event-toggle-btn",
       title: "Add Event",
     });
-    eventToggle.innerHTML = ICONS.calendarPlus;
+    renderIcon(eventToggle, ICONS.calendarPlus);
     eventToggle.onclick = () => this.props.onToggleEventComposer();
 
     const actions = toolbar.createDiv({ cls: "agenda-toolbar-actions" });
 
     this.saveBtn = actions.createEl("button", { cls: "agenda-btn-save", text: "Save" });
-    this.saveBtn.onclick = () => this.handleSubmit();
+    this.saveBtn.onclick = () => {
+      void this.handleSubmit();
+    };
   }
 
   private async handleSubmit() {

@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import { buildCalendarGrid } from "../../utils/calendar";
 
 export interface CalendarData {
@@ -34,11 +34,11 @@ export class CalendarComponent {
 
     const calNav = calHeader.createDiv({ cls: "agenda-cal-nav" });
     const prevBtn = calNav.createEl("button", { cls: "agenda-cal-btn prev", title: "Previous Month" });
-    prevBtn.innerHTML = ICONS.prev;
+    renderIcon(prevBtn, ICONS.prev);
     prevBtn.onclick = () => this.data.onChangeMonth(-1);
 
     const nextBtn = calNav.createEl("button", { cls: "agenda-cal-btn next", title: "Next Month" });
-    nextBtn.innerHTML = ICONS.next;
+    renderIcon(nextBtn, ICONS.next);
     nextBtn.onclick = () => this.data.onChangeMonth(1);
 
     const weekdays = calCard.createDiv({ cls: "agenda-cal-weekdays" });
@@ -65,7 +65,7 @@ export class CalendarComponent {
 
     for (let i = 0; i < gridData.firstDayIndex; i++) {
       const emptyCell = this.gridEl.createDiv({ cls: "agenda-cal-day empty" });
-      emptyCell.innerHTML = "&nbsp;";
+      emptyCell.setText("");
     }
 
     for (const day of gridData.days) {

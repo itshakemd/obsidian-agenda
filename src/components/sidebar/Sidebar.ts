@@ -1,4 +1,4 @@
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import { CalendarComponent, type CalendarData } from "./Calendar";
 import { NavigationComponent, type NavigationData } from "./Navigation";
 import { FoldersListComponent, type FoldersListData } from "./FoldersList";
@@ -45,11 +45,11 @@ export class SidebarComponent {
 
     const header = sidebar.createDiv({ cls: "agenda-sidebar-header" });
     const brand = header.createDiv({ cls: "agenda-brand" });
-    brand.innerHTML = `<span class="agenda-brand-title">Agenda</span>`;
+    brand.createSpan({ cls: "agenda-brand-title", text: "Agenda" });
     brand.onclick = () => this.data.onSelectBrand();
 
     const newBtn = header.createEl("button", { cls: "agenda-new-btn", title: "New entry" });
-    newBtn.innerHTML = ICONS.plus;
+    renderIcon(newBtn, ICONS.plus);
     newBtn.onclick = () => this.data.onNewEntryClick();
 
     this.calendar = new CalendarComponent({

@@ -1,5 +1,5 @@
 import { Menu, type App } from "obsidian";
-import { ICONS } from "../../constants/icons";
+import { ICONS, renderIcon } from "../../constants/icons";
 import { formatEventDateTime } from "../../utils/date";
 import { extractImages, renderInlineFormatting } from "../../utils/markdown";
 import { renderImageGallery } from "./ImageGallery";
@@ -50,7 +50,7 @@ export function renderEventCard(props: EventCardProps): HTMLElement {
 
   const headerActions = header.createDiv({ cls: "agenda-card-header-actions" });
   const menuBtn = headerActions.createEl("button", { cls: "agenda-card-menu-btn", title: "More options" });
-  menuBtn.innerHTML = ICONS.more;
+  renderIcon(menuBtn, ICONS.more);
   menuBtn.onclick = (e) => {
     const menu = new Menu();
     menu.addItem((menuItem) => {
@@ -77,7 +77,7 @@ export function renderEventCard(props: EventCardProps): HTMLElement {
   };
 
   const body = card.createDiv({ cls: "agenda-card-body" });
-  const titleEl = body.createEl("div", { cls: "agenda-card-note-title agenda-event-title", text: event.title });
+  const titleEl = body.createDiv({ cls: "agenda-card-note-title agenda-event-title", text: event.title });
   titleEl.onclick = () => onOpenNote(event.file.path, true);
 
   if (event.description) {
