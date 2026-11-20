@@ -3,7 +3,7 @@
   "name": "Agenda",
   "version": "0.1.0",
   "minAppVersion": "1.13.0",
-  "description": "Agenda and notes for Obsidian.",
+  "description": "Feed-style daily planner, event scheduler, and note organizer.",
   "author": "Hakem",
   "isDesktopOnly": false
 }
