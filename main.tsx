@@ -15,15 +15,15 @@ export default class AgendaPlugin extends Plugin {
     );
 
     const ribbonIconEl = this.addRibbonIcon("calendar", "Open Agenda", () => {
-      this.activateView();
+      void this.activateView();
     });
     ribbonIconEl.addClass("agenda-ribbon-icon");
 
     this.addCommand({
-      id: "open-agenda-view",
-      name: "Open Agenda",
+      id: "open-view",
+      name: "Open view",
       callback: () => {
-        this.activateView();
+        void this.activateView();
       },
     });
   }

@@ -10,7 +10,7 @@ export interface WorkspaceHooks {
 
 export function useWorkspace(app: App): WorkspaceHooks {
   function openNote(path: string, inTab = true): void {
-    app.workspace.openLinkText(path, "", inTab ? "tab" : false);
+    void app.workspace.openLinkText(path, "", inTab ? "tab" : false);
   }
 
   async function copyText(text: string, noticeMsg = "Copied to clipboard"): Promise<void> {

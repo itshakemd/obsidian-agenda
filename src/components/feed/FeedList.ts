@@ -130,10 +130,10 @@ export class FeedListComponent {
         }
         index += CHUNK_SIZE;
         if (index < entries.length) {
-          requestAnimationFrame(renderChunk);
+          window.requestAnimationFrame(renderChunk);
         }
       };
-      requestAnimationFrame(renderChunk);
+      window.requestAnimationFrame(renderChunk);
     }
   }
 }
