@@ -49,7 +49,7 @@ export class EventService {
       const eventTitle = titleMatch ? titleMatch[1].trim() : file.basename;
       const description = content.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
 
-      const tagMatches = content.match(/#([a-zA-Z0-9_\-]+)/g) || [];
+      const tagMatches = content.match(/#([a-zA-Z0-9_-]+)/g) || [];
       const tags = Array.from(new Set(tagMatches.map((t) => t.slice(1))));
 
       const fileDate = new Date(stat.ctime || stat.mtime);
@@ -85,10 +85,13 @@ export class EventService {
 
     const fileContent = description ? `${fm}\n\n${description}` : fm;
     const created = await this.app.vault.create(filePath, fileContent);
-    return created as TFile;
+    if (created instanceof TFile) {
+      return created;
+    }
+    throw new Error("Failed to create event file");
   }
 
   async deleteEvent(file: TFile): Promise<void> {
-    await this.app.vault.delete(file);
+    await this.app.fileManager.trashFile(file);
   }
 }

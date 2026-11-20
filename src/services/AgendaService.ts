@@ -40,7 +40,7 @@ export class AgendaService {
         itemDate = new Date(parseInt(matchTime[0], 10));
       }
 
-      const tagMatches = content.match(/#([a-zA-Z0-9_\-]+)/g) || [];
+      const tagMatches = content.match(/#([a-zA-Z0-9_-]+)/g) || [];
       const tags = Array.from(new Set(tagMatches.map((t) => t.slice(1))));
 
       const linkMatches = Array.from(content.matchAll(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g));
@@ -76,11 +76,14 @@ export class AgendaService {
 
     const created = await this.app.vault.create(filePath, text);
     this.invalidateFolderCache();
-    return created as TFile;
+    if (created instanceof TFile) {
+      return created;
+    }
+    throw new Error("Failed to create agenda file");
   }
 
   async deleteAgendaItem(file: TFile): Promise<void> {
-    await this.app.vault.delete(file);
+    await this.app.fileManager.trashFile(file);
     this.invalidateFolderCache();
   }
 
