@@ -6,8 +6,8 @@ const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "b
 export function extractImages(app: App, content: string, sourcePath: string): { cleanContent: string; images: ExtractedImage[] } {
   const images: ExtractedImage[] = [];
 
-  let clean = content.replace(/!\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (match, linkpath, alt) => {
-    const rawPath = linkpath.trim();
+  let clean = content.replace(/!\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (match: string, linkpath: string, alt: string | undefined): string => {
+    const rawPath: string = (linkpath ?? "").trim();
     const targetFile = app.metadataCache.getFirstLinkpathDest(rawPath, sourcePath);
     if (targetFile && IMAGE_EXTENSIONS.has(targetFile.extension.toLowerCase())) {
       const src = app.vault.getResourcePath(targetFile);
@@ -24,22 +24,22 @@ export function extractImages(app: App, content: string, sourcePath: string): { 
     return match;
   });
 
-  clean = clean.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
-    const rawUrl = url.trim();
+  clean = clean.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match: string, alt: string, url: string): string => {
+    const rawUrl: string = (url ?? "").trim();
     if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://") || rawUrl.startsWith("data:image/")) {
-      images.push({ src: rawUrl, alt: alt.trim() });
+      images.push({ src: rawUrl, alt: (alt ?? "").trim() });
       return "";
     }
     const targetFile = app.metadataCache.getFirstLinkpathDest(rawUrl, sourcePath);
     if (targetFile && IMAGE_EXTENSIONS.has(targetFile.extension.toLowerCase())) {
       const src = app.vault.getResourcePath(targetFile);
-      images.push({ src, alt: alt.trim() || targetFile.basename, file: targetFile });
+      images.push({ src, alt: (alt ?? "").trim() || targetFile.basename, file: targetFile });
       return "";
     }
     const ext = rawUrl.split(".").pop()?.toLowerCase();
     if (ext && IMAGE_EXTENSIONS.has(ext)) {
       if (targetFile) {
-        images.push({ src: app.vault.getResourcePath(targetFile), alt: alt.trim(), file: targetFile });
+        images.push({ src: app.vault.getResourcePath(targetFile), alt: (alt ?? "").trim(), file: targetFile });
         return "";
       }
     }
@@ -60,7 +60,7 @@ export function renderInlineFormatting(
   text: string,
   onTagClick: (tag: string) => void
 ): void {
-  const parts = text.split(/(#[a-zA-Z0-9_\-]+|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|`[^`]+`)/g);
+  const parts = text.split(/(#[a-zA-Z0-9_-]+|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|`[^`]+`)/g);
 
   for (const part of parts) {
     if (!part) continue;
@@ -75,21 +75,21 @@ export function renderInlineFormatting(
     } else if (part.startsWith("[") && part.includes("](")) {
       const linkMatch = part.match(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/);
       if (linkMatch) {
-        const a = container.createEl("a", { text: linkMatch[1], href: linkMatch[2] });
+        const a = container.createEl("a", {
+          cls: "agenda-inline-link",
+          text: linkMatch[1],
+          href: linkMatch[2],
+        });
         a.target = "_blank";
         a.rel = "noopener noreferrer";
-        a.style.color = "var(--text-accent)";
-        a.style.textDecoration = "none";
       } else {
         container.createSpan({ text: part });
       }
     } else if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
-      const code = container.createEl("code", { text: part.slice(1, -1) });
-      code.style.background = "var(--background-modifier-hover)";
-      code.style.color = "var(--text-normal)";
-      code.style.padding = "2px 5px";
-      code.style.borderRadius = "4px";
-      code.style.fontSize = "12px";
+      container.createEl("code", {
+        cls: "agenda-inline-code",
+        text: part.slice(1, -1),
+      });
     } else {
       container.createSpan({ text: part });
     }

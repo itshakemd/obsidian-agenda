@@ -76,7 +76,9 @@ export class AgendaView extends ItemView {
       onSelectDate: (dayKey) => this.controller.selectDate(dayKey),
       onChangeMonth: (delta) => this.controller.changeMonth(delta),
       onSelectFilter: (filter) => this.controller.setFilter(filter),
-      onToggleExclude: (folderPath, excluded) => this.controller.toggleFolderExclusion(folderPath, excluded),
+      onToggleExclude: (folderPath, excluded) => {
+        void this.controller.toggleFolderExclusion(folderPath, excluded);
+      },
       onSelectFolder: (folderPath) => this.controller.setFilter("folder", folderPath),
       onSelectTag: (tag) => this.controller.setFilter("tag", tag),
     });
@@ -98,7 +100,7 @@ export class AgendaView extends ItemView {
         this.controller.createEventWithValidation(title, date, time, desc),
       onCancel: () => this.controller.setShowEventComposer(false),
     });
-    this.eventComposerEl.style.display = "none";
+    this.eventComposerEl.addClass("is-hidden");
 
     this.filterBarEl = feedWrapper.createDiv({ cls: "agenda-filter-bar" });
     this.filterBarComp = new FilterBarComponent({
@@ -149,19 +151,16 @@ export class AgendaView extends ItemView {
       onSelectDate: (dayKey) => this.controller.selectDate(dayKey),
       onChangeMonth: (delta) => this.controller.changeMonth(delta),
       onSelectFilter: (filter) => this.controller.setFilter(filter),
-      onToggleExclude: (folderPath, excluded) => this.controller.toggleFolderExclusion(folderPath, excluded),
+      onToggleExclude: (folderPath, excluded) => {
+        void this.controller.toggleFolderExclusion(folderPath, excluded);
+      },
       onSelectFolder: (folderPath) => this.controller.setFilter("folder", folderPath),
       onSelectTag: (tag) => this.controller.setFilter("tag", tag),
     });
 
     if (this.composerEl && this.eventComposerEl) {
-      if (this.controller.showEventComposer) {
-        this.composerEl.style.display = "none";
-        this.eventComposerEl.style.display = "";
-      } else {
-        this.composerEl.style.display = "";
-        this.eventComposerEl.style.display = "none";
-      }
+      this.composerEl.toggleClass("is-hidden", this.controller.showEventComposer);
+      this.eventComposerEl.toggleClass("is-hidden", !this.controller.showEventComposer);
     }
 
     if (this.filterBarComp) {
