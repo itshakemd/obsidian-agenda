@@ -157,9 +157,9 @@
   font-weight: 600;
 }
 
-.agenda-cal-day.selected {
-  background: var(--interactive-accent) !important;
-  color: var(--text-on-accent) !important;
+.agenda-cal-days .agenda-cal-day.selected {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
   font-weight: 700;
 }
 
@@ -346,6 +346,12 @@
   white-space: nowrap;
 }
 
+
+.agenda-empty-subtext {
+  font-size: 12px;
+  color: var(--text-faint);
+  padding: 4px 8px;
+}
 
 .agenda-tags-list {
   display: flex;

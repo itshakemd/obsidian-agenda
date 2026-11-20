@@ -1,13 +1,20 @@
+.view-content.agenda-view-container,
 .agenda-view-container {
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100% !important;
-  width: 100% !important;
-  overflow: hidden !important;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   background-color: var(--background-primary);
   color: var(--text-normal);
   font-family: var(--font-interface);
   box-sizing: border-box;
+}
+
+.agenda-root .is-hidden,
+.agenda-feed-wrapper .is-hidden,
+.is-hidden {
+  display: none;
 }
 
 .agenda-root {
