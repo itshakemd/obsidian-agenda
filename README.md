@@ -20,7 +20,7 @@ Instead of searching for separate daily notes and event files, you can:
 It is built for people who want planning and note-taking to feel native to Obsidian.
 
 ## Key features
-
+ 
 - **Feed-style overview**: View agenda entries and events together in one chronological workspace
 - **Quick entry composer**: Save plain Markdown, tags, links, code, and checkbox tasks
 - **Interactive tasks**: Complete or reopen `- [ ]` and `- [x]` tasks directly from the feed
