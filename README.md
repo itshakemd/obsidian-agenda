@@ -1,5 +1,5 @@
 # Agenda
-
+ 
 Turn your Obsidian vault into a focused, feed-style workspace for daily notes, tasks, and events.
 
 Agenda is a polished Obsidian plugin that brings your Markdown notes into a unified timeline. Write quick updates, manage unfinished tasks, schedule events, and browse your vault with calendar, folder, and tag filters without leaving a single workspace.
