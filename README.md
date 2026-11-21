@@ -35,7 +35,7 @@ It is built for people who want planning and note-taking to feel native to Obsid
 
 ## Writing in Agenda
 
-### Agenda entries
+### Agenda entries 
 Use the top composer to write anything you want to remember or plan. The toolbar can insert:
 
 - **Tags** (`#project`)
