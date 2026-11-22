@@ -1,91 +1,94 @@
 # Agenda
- 
-Turn your Obsidian vault into a focused, feed-style workspace for daily notes, tasks, and events.
 
-Agenda is a polished Obsidian plugin that brings your Markdown notes into a unified timeline. Write quick updates, manage unfinished tasks, schedule events, and browse your vault with calendar, folder, and tag filters without leaving a single workspace.
+Agenda brings your Obsidian notes, tasks, and events into one focused feed. Capture quick entries, manage unfinished work, schedule events, and filter your vault by calendar date, folder, or tag without leaving your workspace.
+
+Agenda is a polished planning view for Obsidian that turns everyday Markdown notes into a clear, interactive agenda.
 
 ## Why this plugin?
 
-If your to-do list, notes, and calendar are spread across your vault, Agenda keeps them in one clear view.
+Planning information is often spread across daily notes, folders, task lists, and event files. Agenda brings those pieces together in a single workspace.
 
-Instead of searching for separate daily notes and event files, you can:
+Instead of jumping between searches and documents, you can:
 
-- capture a quick agenda entry in seconds
-- turn Markdown checkboxes into an interactive task list
-- add dated events with optional times and descriptions
-- browse entries by date, folder, tag, or unfinished status
-- open the original vault note or copy its Markdown
-- switch between a chronological feed and a tile layout
+- write quick agenda entries
+- manage Markdown tasks directly from the feed
+- add events with dates and optional times
+- browse entries from a calendar
+- filter notes by folder or tag
+- switch between feed and tile layouts
+- open the original note in Obsidian
 
-It is built for people who want planning and note-taking to feel native to Obsidian.
+It is built for people who want planning and note-taking to feel natural inside their vault.
 
 ## Key features
- 
-- **Feed-style overview**: View agenda entries and events together in one chronological workspace
-- **Quick entry composer**: Save plain Markdown, tags, links, code, and checkbox tasks
-- **Interactive tasks**: Complete or reopen `- [ ]` and `- [x]` tasks directly from the feed
-- **Event scheduling**: Create events with a title, date, optional time, and notes
-- **Calendar navigation**: Highlight agenda and event days and filter the feed to a specific date
-- **Folder filtering**: Browse entries from every vault folder or focus on a single folder
-- **Hidden folders**: Exclude selected folders from counts and feed results
-- **Tag discovery**: Automatically collect `#tags` from agenda and event Markdown
-- **Feed and tile views**: Switch between a compact timeline and a card-based layout
-- **Markdown-aware cards**: Render tags, links, images, and task checkboxes in the feed
-- **Vault integration**: Open source notes in Obsidian tabs or copy agenda and event content
 
-## Writing in Agenda
+- **Unified feed**: View agenda entries and events together in one chronological timeline
+- **Quick capture**: Add text, tags, tasks, links, code, and event entries from the composer
+- **Interactive tasks**: Check off unfinished tasks and reopen completed work directly in the feed
+- **Event scheduling**: Create dated events with titles, optional times, and notes
+- **Calendar navigation**: Select a date to filter the feed and highlight days with entries or events
+- **Folder filtering**: Browse a specific folder or organize entries across your vault
+- **Tag discovery**: Automatically find tags used in your Markdown and filter by them
+- **Flexible layouts**: Switch between a compact feed and visual tile view
+- **Rich cards**: View formatted text, tags, links, images, and tasks without leaving Agenda
+- **Vault integration**: Open source notes, copy their contents, or delete entries from Obsidian
+- **Flexible folder visibility**: Hide folders you do not want included in the agenda
 
-### Agenda entries 
-Use the top composer to write anything you want to remember or plan. The toolbar can insert:
+## Planning with Agenda
 
-- **Tags** (`#project`)
-- **Todo tasks** (`- [ ]`)
-- **Links**
-- **Code blocks**
-- **Events**
+### Quick entries
 
-Press `Ctrl/Cmd + Enter` or click **Save** to add it to your agenda.
+Use the composer at the top of the workspace to add an update, reminder, thought, or task. The toolbar makes it easy to insert tags, todo items, links, code, and events.
+
+Press `Ctrl/Cmd + Enter` or click **Save** to add the entry to your agenda.
+
+### Tasks
+
+Agenda recognizes standard Markdown checkboxes. Checked and unfinished tasks remain interactive in the feed, so you can update progress without opening the source note.
 
 ### Events
-Switch from the agenda composer to **New Event**, then add:
+
+Switch to the event composer to add:
 
 - an event title
-- an event date
+- a date
 - an optional time
 - optional notes
 
-### Tasks and tags
-Tasks use standard Markdown checkbox syntax, while tags use `#tag` syntax. Existing notes can appear in the workspace without special setup.
+The event appears in the unified feed and calendar, making it easy to keep schedules alongside daily notes.
 
-Tags and folders are also clickable: choose a card pill or use the sidebar to narrow the feed to a matching view.
+### Tags and folders
+
+Tags and folders act as filters. Select a tag from a card or sidebar, choose a folder, or open a date in the calendar to narrow the workspace to exactly what you need.
 
 ## The workflow
 
 1. Open Agenda from the ribbon or run **Open view** from the command palette.
-2. Capture an update in the agenda composer.
-3. Use the toolbar to add tags, tasks, links, code, or switch to event mode.
-4. Review the timeline in feed or tile view.
+2. Capture a quick entry in the composer.
+3. Add tasks, tags, links, code, or switch to event mode.
+4. Review your entries in feed or tile view.
 5. Filter by unfinished tasks, events, date, folder, or tag.
-6. Check tasks directly in the feed or open the source Markdown in Obsidian.
-7. Hide folders you do not want included, when needed.
+6. Check off tasks or open the original Markdown note in Obsidian.
+7. Hide folders that should stay outside the Agenda feed.
 
 ## Configuration & settings
 
-Agenda currently supports folder exclusions through the sidebar:
+Choose which folders appear in Agenda with the folder checkboxes in the sidebar:
 
-- **Include folder**: Check a folder to include it in the feed and counts.
-- **Hide folder**: Uncheck a folder to exclude it from agenda counts and feed results.
+- **Check a folder** to include it in the feed and counts
+- **Uncheck a folder** to hide it from agenda views
+- **Clear a filter** to return to the complete view
 
 ## Built for
 
-- people maintaining a daily or weekly note system
-- Obsidian users who want tasks and events alongside their notes
-- creators tracking ideas, follow-ups, and projects from one feed
-- teams of one organizing Markdown across many folders
-- anyone who prefers a visual agenda over separate search queries
+- people who maintain daily or weekly notes
+- Obsidian users who want tasks and events in one place
+- creators tracking ideas, follow-ups, and projects
+- anyone organizing Markdown across many folders
+- users who prefer a visual agenda over separate searches
 
 ## Why it stands out
 
-Agenda is not a separate productivity app living outside your notes. It is a visual layer over the Markdown already in your Obsidian vault.
+Agenda is not a separate productivity system outside your vault. It is a visual layer over the Markdown notes you already use.
 
-It keeps capture, planning, task tracking, and event scheduling in one focused workspace that feels natural, fast, and easy to navigate.
+It brings capture, planning, task tracking, and event scheduling into one focused workspace that feels natural, fast, and easy to navigate.
