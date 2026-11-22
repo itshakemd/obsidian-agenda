@@ -32,9 +32,11 @@
   overflow-x: hidden;
   background-color: var(--background-primary);
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .agenda-feed-wrapper {
+  width: 100%;
   max-width: 680px;
   margin: 0 auto;
   padding: 24px 20px 48px 20px;
@@ -42,4 +44,5 @@
   flex-direction: column;
   gap: 20px;
   box-sizing: border-box;
+  min-width: 0;
 }
